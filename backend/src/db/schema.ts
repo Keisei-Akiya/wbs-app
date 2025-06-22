@@ -1,33 +1,19 @@
-import {
-  boolean,
-  pgTable,
-  timestamp,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
+// ドリズルのスキーマ定義
+
+// ユーザーテーブルの定義
 export const usersTable = pgTable('users', {
   id: uuid('id').defaultRandom().primaryKey(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }).notNull().unique(),
-  password: varchar('password', { length: 255 }).notNull(),
+  // 名前
+  name: varchar({ length: 255 }).notNull(),
+  // メールアドレス
+  email: varchar({ length: 255 }).notNull().unique(),
+  // 作成日時
   createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  // 更新日時
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
 });
-
-export const todoTable = pgTable('todo', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  assignee: uuid('assignee')
-    .notNull()
-    .references(() => usersTable.id),
-  createdBy: uuid('created_by')
-    .notNull()
-    .references(() => usersTable.id),
-  todo: varchar('todo', { length: 255 }).notNull(),
-  done: boolean('done').notNull().default(false),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
-
-export type User = typeof usersTable.$inferSelect;
-export type InsertUser = typeof usersTable.$inferInsert;
